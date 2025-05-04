@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import authRouter from './router/auth.route.js';
 
 // Load environment variables
 dotenv.config();
@@ -22,9 +23,25 @@ const connectDB = async () => {
   }
 };
 
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   await connectDB();
   console.log(`🚀 Server is running on port ${PORT}`);
+});
+
+// Auth Router
+app.use("/api/auth",authRouter );
+
+// Middleware
+app.use(( err ,req, res, next) => {
+  // console.log(">>>>>>>>>>>>>>>>>>>",err);
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal server errro";
+  return res.status(statusCode).json({
+    succcess : false,
+    statusCode,
+    message
+  });
 });
