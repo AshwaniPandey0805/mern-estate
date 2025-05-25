@@ -19,7 +19,7 @@ const connectDB = async () => {
     console.log('✅ MongoDB connected');
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
-    process.exit(1); // Exit the process if DB connection fails
+    process.exit(1);
   }
 };
 
@@ -32,11 +32,10 @@ app.listen(PORT, async () => {
 });
 
 // Auth Router
-app.use("/api/auth",authRouter );
+app.use("/api/auth", authRouter );
 
 // Middleware
 app.use(( err ,req, res, next) => {
-  // console.log(">>>>>>>>>>>>>>>>>>>",err);
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal server errro";
   return res.status(statusCode).json({
