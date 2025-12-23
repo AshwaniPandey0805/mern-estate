@@ -1,7 +1,46 @@
-import React from 'react'
-import {Link} from "react-router-dom"
+import React, { useState } from 'react'
+import {Link,  useNavigate} from "react-router-dom"
+import { authValidationHandler } from '../validations/auth.validation.js';
+import { signUpUser } from '../services/auth.service.js';
 
 function SignUp() {
+  const [formData, setFormData] = useState({});
+  const [error, setError] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const handleFormChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id] : e.target.value
+    });
+    // console.log(formData);
+  };
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = authValidationHandler(formData);
+    if(Object.keys(validationError).length > 0){
+      setError(validationError);
+      return;
+    }
+    console.log("formData >> : ", formData);
+    try {
+      setIsLoading(true);
+      setError({});
+      const res = await signUpUser(formData);
+      console.log("res.data >>>>>>>>>>>>>> : " , res.data);
+      setIsLoading(false);
+      navigate('/sign-in');
+    } catch (error) {
+      if(error.response?.data?.errors){
+        const backendErrors = {};
+        error.response.data.errors.forEach((e) => {
+          backendErrors[e.field] = e.message;
+        });
+        setError(backendErrors);
+        setIsLoading(false);
+      }    
+    }
+  };
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl text-center font-semibold my-7'>Sign Up</h1>
@@ -19,8 +58,11 @@ function SignUp() {
             transition
           "
           id='username'
+          onChange={handleFormChange}
         />
-
+        {error.username && (
+          <p className='text-red-600 text-sm'>{error.username}</p>
+        ) }
         <input 
           type="email" 
           placeholder='email' 
@@ -34,7 +76,11 @@ function SignUp() {
             transition
           " 
           id='email'
+          onChange={handleFormChange}
         />
+        {error.email && (
+          <p className='text-red-600 text-sm' >{error.email}</p>
+        )}
         <input 
           type="password" 
           placeholder='password' 
@@ -48,15 +94,22 @@ function SignUp() {
             transition
           " 
           id='password'
+          onChange={handleFormChange}
         />
-        <button 
+        {error.password && (
+          <p className='text-red-600 text-sm' >{error.password}</p>
+        )}
+        <button
+          disabled={isLoading} 
           className='
             bg-slate-700 
             text-white p-3
             rounded-lg
             uppercase
-            hover:opacity-95 '>
-              Sign up
+            hover:opacity-95 '
+            onClick={handleFormSubmit}
+            >
+              { isLoading ? 'Loading...' : 'Sign up' }
         </button>
       </form>
       <div className='flex gap-2 mt-5'>

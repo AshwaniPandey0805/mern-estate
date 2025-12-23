@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRouter from "./router/auth.router.js";
 import connectDB from "./config/db.js";
-
+import cors from "cors";
 /**
  * App & Config
  */
@@ -19,10 +19,30 @@ const PORT = 3000;
  */
 app.use(express.json());
 
+const allowedOrigins = [
+    "http://localhost:5173",
+];
+
+/**
+ * CORS Config 
+ */
+app.use(
+    cors({
+        origin : (origin, callback) => {
+            if(!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback (new Error("Not allowed by CORS"));
+            }
+        },
+        credentials : true
+    })
+);
+
 /**
  * Routes
  */
-app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 /**
  * Health check 
