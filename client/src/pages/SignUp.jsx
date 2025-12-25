@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {Link,  useNavigate} from "react-router-dom"
 import { authValidationHandler } from '../validations/auth.validation.js';
 import { signUpUser } from '../services/auth.service.js';
+import { toast } from "react-toastify";
 
 function SignUp() {
   const [formData, setFormData] = useState({});
@@ -27,8 +28,8 @@ function SignUp() {
       setIsLoading(true);
       setError({});
       const res = await signUpUser(formData);
-      console.log("res.data >>>>>>>>>>>>>> : " , res.data);
       setIsLoading(false);
+      toast.success("User Register Successfully");
       navigate('/sign-in');
     } catch (error) {
       if(error.response?.data?.errors){
@@ -38,7 +39,14 @@ function SignUp() {
         });
         setError(backendErrors);
         setIsLoading(false);
-      }    
+      }
+      setError(error);
+      setIsLoading(false);
+      // console.log("getting error message here : ", error.response?.data);
+      toast.error(
+        error.response?.data?.message  || "Internal Server Error"
+      )
+      // console.log("getting error for this side : ", error.response?.data);    
     }
   };
   return (
