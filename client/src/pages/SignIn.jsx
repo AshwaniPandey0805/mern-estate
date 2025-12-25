@@ -3,13 +3,15 @@ import {Link,  useNavigate} from "react-router-dom"
 import { authValidationHandler } from '../validations/auth.validation.js';
 import { signInUser} from '../services/auth.service.js';
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice.js';
 
 function SignIn() {
 
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, error } = useSelector((state) => state.user); 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleFormChange = (e) => {
     setFormData({
@@ -24,17 +26,14 @@ function SignIn() {
     const validationError = authValidationHandler(formData, true);
     
     if(Object.keys(validationError).length > 0){
-      setError(validationError);
+      dispatch(signInFailure(validationError));
       return;
     }
 
     try {
-      setIsLoading(true);
-      setError({});
-      
+      dispatch(signInStart());
       const res = await signInUser(formData);
-      
-      setIsLoading(false);
+      dispatch(signInSuccess(res.data))
       toast.success("User Logged in Successfully");
       navigate('/');
 
@@ -42,17 +41,12 @@ function SignIn() {
 
       if(error.response?.data?.errors){
         const backendErrors = {};
-      
         error.response.data.errors.forEach((e) => {
           backendErrors[e.field] = e.message;
         });
-
-        setError(backendErrors);
-        setIsLoading(false);
+        dispatch(signInFailure(backendErrors))
       }
-      
-      setError(error);
-      setIsLoading(false);
+      dispatch(signInFailure(error.response?.data?.message))
       toast.error(
         error.response?.data?.message  || "Internal Server Error"
       )
@@ -96,7 +90,7 @@ function SignIn() {
           id='email'
           onChange={handleFormChange}
         />
-        {error.email && (
+        {error?.email && (
           <p className='text-red-600 text-sm' >{error.email}</p>
         )}
         <input 
@@ -114,7 +108,7 @@ function SignIn() {
           id='password'
           onChange={handleFormChange}
         />
-        {error.password && (
+        {error?.password && (
           <p className='text-red-600 text-sm' >{error.password}</p>
         )}
         <button
