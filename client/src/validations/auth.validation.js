@@ -1,9 +1,13 @@
-export const authValidationHandler = ({username, email, password}) => {
+export const authValidationHandler = ({username, email, password}, fromSignIn = false) => {
     const error = {};
-    if(!username || username.trim().length < 3) {
-        error.username = "Username must be at least 3 character.";
+    console.log("fromSignIn : ", fromSignIn);
+    if(!fromSignIn){
+        
+        console.log("Yaha abhi bhi jaa rha h kya ???");
+        if(!username || username.trim().length < 3) {
+            error.username = "Username must be at least 3 character.";
+        }
     }
-
     if(!email){
         error.email = "Email is required.";
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
