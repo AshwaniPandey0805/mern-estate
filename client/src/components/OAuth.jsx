@@ -5,30 +5,52 @@ import { useDispatch } from 'react-redux';
 import { signInSuccess, signInFailure } from "../redux/user/userSlice.js";
 import { useNavigate } from "react-router-dom";
 import { app } from "../firebase.js";
+import { toast } from "react-toastify";
+import { useState } from 'react';
 
 
 function OAuth() {
 
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleGoogleClick = async () => {
-        console.log("Hittig here");
+    const handleGoogleClick = async () => {         
+        
         try {
-            
+
+            setLoading(true);
             const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt:"select_account"
+            });
+            
             const auth = getAuth(app);
-    
             const result = await signInWithPopup(auth, provider);
-            const response = await signInUserWithGoogleAuthProvider(result);
+            console.log("result : ", result);
+            // 🔐 Send ID token to backend
+            const idToken = await result.user.getIdToken();
+            
+            console.log("idToken : ", idToken);
+            
+            const response = await signInUserWithGoogleAuthProvider(idToken);
+
             dispatch(signInSuccess(response.data));
             navigate("/") // redirect to home page
 
-        } catch (error) {   
-            console.log("also hitting here");
+            toast.success("User Logged in Successfully");
+        
+        } catch (error) {
 
-            dispatch(signInFailure(error));
-        }
+            dispatch(signInFailure(
+                error?.response?.data?.message || "Google sign-in failed"
+            ));
+            toast.error(
+                error.response?.data?.message  || "Google sign-in failed"
+            )
+        } finally {
+            setLoading(false);
+        }    
     }
 
     return (
@@ -37,7 +59,7 @@ function OAuth() {
             onClick={handleGoogleClick}
             className='bg-red-700 p-3 text-white rounded-lg uppercase hover:opacity-95'
         >
-            Continue with google
+            {loading ? 'Signing in...' : 'Continue with Google'}
         </button>
   )
 }
