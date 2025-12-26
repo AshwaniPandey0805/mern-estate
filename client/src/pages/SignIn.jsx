@@ -5,6 +5,7 @@ import { signInUser} from '../services/auth.service.js';
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice.js';
+import OAuth from '../components/OAuth.jsx';
 
 function SignIn() {
 
@@ -123,6 +124,7 @@ function SignIn() {
             >
               { isLoading ? 'Loading...' : 'Sign in' }
         </button>
+        <OAuth /> 
       </form>
       <div className='flex gap-2 mt-5'>
         <p>Dont have an account?</p>
