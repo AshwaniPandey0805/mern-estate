@@ -1,5 +1,5 @@
 import express from 'express';
-import { signin, signup } from '../controller/auth.controller.js';
+import { signin, signup , google } from '../controller/auth.controller.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { signInSchema, signUpSchema } from '../schemas/auth.schema.js';
@@ -14,4 +14,9 @@ authRouter.post(
     validate(signInSchema),
     asyncHandler(signin)
 );
+
+authRouter.post(
+    "/google",
+    asyncHandler(google)
+)
 export default authRouter;
