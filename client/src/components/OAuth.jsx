@@ -27,12 +27,10 @@ function OAuth() {
             
             const auth = getAuth(app);
             const result = await signInWithPopup(auth, provider);
-            console.log("result : ", result);
+
             // 🔐 Send ID token to backend
             const idToken = await result.user.getIdToken();
-            
-            console.log("idToken : ", idToken);
-            
+                        
             const response = await signInUserWithGoogleAuthProvider(idToken);
 
             dispatch(signInSuccess(response.data));
