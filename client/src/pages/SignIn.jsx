@@ -10,7 +10,9 @@ import OAuth from '../components/OAuth.jsx';
 function SignIn() {
 
   const [formData, setFormData] = useState({});
+  const [ formError, setFormError ] = useState({});
   const { isLoading, error } = useSelector((state) => state.user); 
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -27,7 +29,8 @@ function SignIn() {
     const validationError = authValidationHandler(formData, true);
     
     if(Object.keys(validationError).length > 0){
-      dispatch(signInFailure(validationError));
+      // dispatch(signInFailure(validationError));
+      setFormError(validationError);
       return;
     }
 
@@ -56,7 +59,7 @@ function SignIn() {
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
-      <h1 className='text-3xl text-center font-semibold my-7'>Sign Up</h1>
+      <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
       <form action="" className='flex flex-col gap-4'>
         {/* <input
           type="text"
@@ -91,8 +94,8 @@ function SignIn() {
           id='email'
           onChange={handleFormChange}
         />
-        {error?.email && (
-          <p className='text-red-600 text-sm' >{error.email}</p>
+        {formError?.email && (
+          <p className='text-red-600 text-sm' >{formError.email}</p>
         )}
         <input 
           type="password" 
@@ -109,8 +112,8 @@ function SignIn() {
           id='password'
           onChange={handleFormChange}
         />
-        {error?.password && (
-          <p className='text-red-600 text-sm' >{error.password}</p>
+        {formError?.password && (
+          <p className='text-red-600 text-sm' >{formError.password}</p>
         )}
         <button
           disabled={isLoading} 

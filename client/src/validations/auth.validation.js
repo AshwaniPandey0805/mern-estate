@@ -2,8 +2,6 @@ export const authValidationHandler = ({username, email, password}, fromSignIn = 
     const error = {};
     console.log("fromSignIn : ", fromSignIn);
     if(!fromSignIn){
-        
-        console.log("Yaha abhi bhi jaa rha h kya ???");
         if(!username || username.trim().length < 3) {
             error.username = "Username must be at least 3 character.";
         }
