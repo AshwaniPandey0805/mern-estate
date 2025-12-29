@@ -56,7 +56,9 @@ export const google = async  ( req, res, next ) => {
 
     // verify firebase token
     const decodeToken = await admin.auth().verifyIdToken(idToken);
+    console.log("decodeToken : ", decodeToken);
     const {email, name, picture} = decodeToken;
+    
 
     let user = await User.findOne({email});
 
@@ -81,7 +83,7 @@ export const google = async  ( req, res, next ) => {
 
     const { password, ...userData } = user._doc;
     res
-        .cookie("acess_token", token, {
+        .cookie("access_token", token, {
             httpOnly : true,
             // secure: process.env.NODE_ENV === "production",
             // sameSite: "strict",

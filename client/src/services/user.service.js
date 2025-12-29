@@ -6,3 +6,15 @@ export const updateUser = ( id, data) => {
         data
     );
 }
+
+export const deleteUser = (id) => {
+    return api.delete(
+        `user/delete/${id}`
+    )
+}
+
+export const signOutUser = (id) => {
+    return api.post(
+        `user/sign-out/${id}`
+    );
+}

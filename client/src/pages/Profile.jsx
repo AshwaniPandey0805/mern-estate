@@ -8,11 +8,17 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { authValidationHandler } from "../validations/auth.validation";
-import { updateUser } from "../services/user.service.js";
+import { deleteUser, signOutUser, updateUser } from "../services/user.service.js";
 import {
   updateUserStart,
   updateUserSuccess,
-  updateUserFailure
+  updateUserFailure,
+  signOutStart,
+  signOutSuccess,
+  signOutFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure
 } from "../redux/user/userSlice.js"
 import { toast } from "react-toastify";
 
@@ -128,9 +134,51 @@ function Profile() {
       dispatch(updateUserFailure(error.response?.data));
       toast.error(
         error.response?.data?.message
-      )  
+      );  
     }
 
+    
+  }
+  
+  const handelSignOut = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(signOutStart());
+      const response = await signOutUser(currentUser._id);
+      console.log("response from sign out api : ", response);
+      if(response.data.status === true){
+        dispatch(signOutSuccess());
+        toast.success(
+          "User Sign Out Successfully."
+        )
+      }
+    } catch(error) {
+      dispatch(signOutFailure(error?.response?.data));
+      console.log(error?.response?.data?.message);
+    }
+  }
+
+  const handleUserDelete = async (e) => {
+    console.log("sdsdasdsdasdasdas");
+    e.preventDefault();
+    try {
+      dispatch(deleteUserStart());
+      const response = await deleteUser(currentUser._id);
+      console.log("response from delete user api : ", response);
+      if(response.data.status === true) {
+        dispatch(deleteUserSuccess());
+        toast.success(
+          "User Deleted Successfully."
+        );
+      }
+    } catch (error) {
+      
+      console.log("error : ", error);
+      dispatch(deleteUserFailure(error?.response?.data));
+      toast.error(
+        error?.response?.data?.message
+      )
+    }
   }
 
   return (
@@ -240,8 +288,16 @@ function Profile() {
       </form>
 
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span
+          onClick={handleUserDelete} 
+          className="text-red-700 cursor-pointer">
+            Delete account
+        </span>
+        <span
+          onClick={handelSignOut}
+          className="text-red-700 cursor-pointer">
+            Sign out
+          </span>
       </div>
     </div>
   );
