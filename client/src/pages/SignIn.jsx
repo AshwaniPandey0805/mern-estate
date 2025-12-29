@@ -37,6 +37,7 @@ function SignIn() {
     try {
       dispatch(signInStart());
       const res = await signInUser(formData);
+      console.log("Response form sign in api : " , res);
       dispatch(signInSuccess(res.data))
       toast.success("User Logged in Successfully");
       navigate('/');

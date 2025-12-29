@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch ,useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -7,6 +7,14 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import { authValidationHandler } from "../validations/auth.validation";
+import { updateUser } from "../services/user.service.js";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure
+} from "../redux/user/userSlice.js"
+import { toast } from "react-toastify";
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -19,9 +27,11 @@ function Profile() {
   const [uploadError, setUploadError] = useState("");
   const [formData, setFormData] = useState({});
   const [uploading, setUploading] = useState(false);
+  const [ error, setError ] = useState({});
 
   const fileRef = useRef(null);
   const uploadTaskRef = useRef(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (file) uploadImage(file);
@@ -31,6 +41,16 @@ function Profile() {
       uploadTaskRef.current?.cancel();
     };
   }, [file]);
+
+  useEffect(() => {
+    if(currentUser) {
+      setFormData({
+        username : currentUser.username || "",
+        email : currentUser.email || "",
+        avatar : currentUser.avatar || ""
+      });
+    }
+  }, [currentUser])
 
   const validateFile = (file) => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -78,6 +98,40 @@ function Profile() {
       }
     );
   };
+
+  const handelFormChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id] : e.target.value
+    }));
+
+    console.log(formData);
+  }
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = authValidationHandler(formData);
+    if(Object.keys(validationError).length > 0) {
+      setError(validationError);
+      return;
+    }
+    setError({});
+    try {
+      const currentUserId = currentUser._id;
+      const response = await updateUser( currentUserId, formData);
+      console.log("User Update Response : ", response.data?.user);
+      dispatch(updateUserSuccess(response.data?.user));
+      toast.success("User Updated Successfully.")
+    } catch (error) {
+    
+      console.log("error.response?.data : ",error.response?.data);
+      dispatch(updateUserFailure(error.response?.data));
+      toast.error(
+        error.response?.data?.message
+      )  
+    }
+
+  }
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -133,28 +187,53 @@ function Profile() {
           type="text"
           id="username"
           placeholder="username"
-          defaultValue={currentUser.username}
+          value={formData.username || ""}
           className="p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"
+          onChange={handelFormChange}
         />
+        {
+          error.username && (
+            <p className="text-red-600 text-sm" >
+              {error.username}
+            </p>
+          )
+        }
 
         <input
           type="email"
           id="email"
           placeholder="email"
-          defaultValue={currentUser.email}
+          value={formData.email || ""}
           className="p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"
+          onChange={handelFormChange}
         />
+        {
+          error.email && (
+            <p className="text-red-600 text-sm" >
+              {error.email}
+            </p>
+          )
+        }
 
         <input
           type="password"
           id="password"
           placeholder="password"
           className="p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"
+          onChange={handelFormChange}
         />
+        {
+          error.password && (
+            <p className="text-red-600 text-sm" >
+              {error.password}
+            </p>
+          )
+        }
 
         <button
           disabled={uploading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-70"
+          onClick={handleFormSubmit}
         >
           Update
         </button>

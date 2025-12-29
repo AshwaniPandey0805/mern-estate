@@ -7,6 +7,9 @@ import dotenv from "dotenv";
 import authRouter from "./router/auth.router.js";
 import connectDB from "./config/db.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import userRouter from "./router/user.route.js";
+
 /**
  * App & Config
  */
@@ -18,6 +21,7 @@ const PORT = 3000;
  * Global Middleware
  */
 app.use(express.json());
+app.use(cookieParser());
 
 const allowedOrigins = [
     "http://localhost:5173",
@@ -43,6 +47,7 @@ app.use(
  * Routes
  */
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 /**
  * Health check 

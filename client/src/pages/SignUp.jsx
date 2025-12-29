@@ -9,11 +9,16 @@ function SignUp() {
   const [error, setError] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleFormChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id] : e.target.value
-    });
+    setFormData(( formData ) => 
+      (
+        {
+          ...formData,
+          [e.target.id] : e.target.value
+        }
+      )
+    );
     // console.log(formData);
   };
   const handleFormSubmit = async (e) => {
