@@ -22,6 +22,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:5173",
+   "https://mern-estate-2-fv0l.onrender.com"
 ];
 
 app.use(
