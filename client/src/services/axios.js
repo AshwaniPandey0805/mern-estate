@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL : "http://localhost:3000/api", // base url
+    baseURL : "https://mern-estate-2-fv0l.onrender.com/api", // base url
     timeout : 10000,
     headers : {
         "Content-Type" : "application/json",
