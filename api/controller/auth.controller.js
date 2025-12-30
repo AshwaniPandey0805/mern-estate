@@ -3,6 +3,7 @@ import {errorHandler} from "../utils/error.handler.js";
 import jwt from 'jsonwebtoken'
 import bcryptjs from "bcryptjs";
 import admin from "../config/firebaseAdmin.js";
+import crypto from "crypto";
 
 export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
