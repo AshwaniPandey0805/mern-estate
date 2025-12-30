@@ -9,6 +9,7 @@ import connectDB from "./config/db.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./router/user.route.js";
+import path from "path";
 
 /**
  * App & Config
@@ -16,6 +17,15 @@ import userRouter from "./router/user.route.js";
 dotenv.config();
 const app = express();
 const PORT = 3000;
+
+/**
+ * Render Deployement Code
+ */
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, '/client/dist')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
 
 /**
  * Global Middleware
